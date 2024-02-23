@@ -34,7 +34,7 @@ export default function Home() {
             text-gray-900
           "
           >
-            Sign in to your account
+            Login
         </h2>
       </div>  
       <AuthForm />
