@@ -1,9 +1,15 @@
 'use client'
 
+import axios from "axios"
+
 import Button from "@/app/components/Button"
 import Input from "@/app/components/Input"
+
 import { useCallback, useState } from "react"
 import { FieldValues, useForm, SubmitHandler } from "react-hook-form"
+import { signIn } from "next-auth/react"
+import toast from "react-hot-toast"
+
 
 type Variant = 'LOGIN' | 'REGISTER'
 
@@ -33,13 +39,29 @@ const AuthForm = () => {
         }
     })
 
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    const onSubmit: SubmitHandler<FieldValues> = async(data) => {
         setIsLoading(true)
 
-        if (variant === 'LOGIN') {
-            // call login route
-        } else {
-            // call register route
+        if (variant === 'REGISTER') {
+            axios.post('/api/register', data)
+            .catch(() => toast.error('Something went wrong!'))
+            .finally(() => setIsLoading(false))
+        } else if (variant === 'LOGIN') {
+            signIn('credentials', {
+                ...data,
+                redirect: false
+            })
+            .then((callback) => {
+                if (callback?.error) {
+                    toast.error('Invalid credentials')
+                }
+
+                if (callback?.ok && !callback?.error) {
+                    toast.success('Logged in!')
+                }
+
+            })
+            .finally(() => setIsLoading(false))
         }
     }
 
