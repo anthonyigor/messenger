@@ -6,6 +6,8 @@ import { Conversation, User } from "@prisma/client"
 import clsx from "clsx"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
+import { useState } from "react"
+import ImageModal from "./ImageModal"
 
 interface MessageBoxProps {
     data: FullMessageType
@@ -21,6 +23,7 @@ const MessageBox: React.FC<MessageBoxProps> = ({
     conversation
 }) => {
     const session = useSession()
+    const [modalImageOpen, setModalImageOpen] = useState(false)
 
     const isOwn = session.data?.user?.email === data.sender.email
     const seenList = (data.seen || [])
@@ -60,8 +63,14 @@ const MessageBox: React.FC<MessageBoxProps> = ({
                     </>
                 )}
                 <div className={message}>
+                    <ImageModal
+                        src={data.image}
+                        isOpen={modalImageOpen}
+                        onClose={() => setModalImageOpen(false)}
+                    />
                     {data.image ? (
-                        <Image 
+                        <Image
+                            onClick={() => setModalImageOpen(true)} 
                             alt="Image"
                             height='288'
                             width='288'
